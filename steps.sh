@@ -42,7 +42,7 @@ az network private-dns link vnet create \
 PRIVATE_STORAGE_ACCOUNT="webapache"
 az storage account create -g $RESOURCE_GROUP \
 --name $PRIVATE_STORAGE_ACCOUNT \
---sku Standard_LRS \
+--sku Standard_ZRS \
 --default-action Deny
 
 STORAGE_ACCOUNT_ID=$(az storage account show --name $PRIVATE_STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP --query "id" --output tsv)
@@ -91,8 +91,7 @@ az aks create \
     --vnet-subnet-id $SUBNET_AKS_ID \
     --service-principal $appId \
     --client-secret $password
-    # --aks-custom-headers EnableAzureDiskFileCSIDriver=true
-
+    
 
 # Get AKS credentials
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME
