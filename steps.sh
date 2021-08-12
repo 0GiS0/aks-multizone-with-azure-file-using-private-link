@@ -1,11 +1,13 @@
 #Variables
-RESOURCE_GROUP="aks-multi-zones"
+RESOURCE_GROUP="AKS-Demo"
 AKS_NAME="ha-aks"
 LOCATION="northeurope"
 VNET="aks-vnet"
 SUBNET_AKS="aks-subnet"
 SUBNET_ENDPOINTS="endpoints"
 PRIVATE_DNS_ZONE="private.file.core.windows.net"
+PRIVATE_STORAGE_ACCOUNT="webapache"
+RECORD_SET_NAME="web-apache-storage"
 
 #Create Resource Group
 az group create --name $RESOURCE_GROUP --location $LOCATION
@@ -39,7 +41,6 @@ az network private-dns link vnet create \
 # Create an Azure Storage only accesible via private link
 # So you need:
 # 1. Create a storage account
-PRIVATE_STORAGE_ACCOUNT="webapache"
 az storage account create -g $RESOURCE_GROUP \
 --name $PRIVATE_STORAGE_ACCOUNT \
 --sku Standard_ZRS \
@@ -47,7 +48,7 @@ az storage account create -g $RESOURCE_GROUP \
 
 STORAGE_ACCOUNT_ID=$(az storage account show --name $PRIVATE_STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP --query "id" --output tsv)
 
-# 1. Create a private endpoint for the storage account
+# 2. Create a private endpoint for the storage account
 az network private-endpoint create --resource-group $RESOURCE_GROUP \
 --name $PRIVATE_STORAGE_ACCOUNT \
 --vnet-name $VNET \
@@ -57,15 +58,14 @@ az network private-endpoint create --resource-group $RESOURCE_GROUP \
 --group-id file \
 --private-connection-resource-id $STORAGE_ACCOUNT_ID 
 
-#Get the ID of the azure storage NIC
+# 3. Get the ID of the azure storage NIC
 STORAGE_NIC_ID=$(az network private-endpoint show --name $PRIVATE_STORAGE_ACCOUNT -g $RESOURCE_GROUP --query 'networkInterfaces[0].id' -o tsv)
 
-#Get the IP of the azure storage NIC
+# 4. Get the IP of the azure storage NIC
 STORAGE_ACCOUNT_PRIVATE_IP=$(az resource show --ids $STORAGE_NIC_ID --query 'properties.ipConfigurations[0].properties.privateIPAddress' --output tsv)
 
-#Setup DNS with the new private endpoint
+# 5. Setup DNS with the new private endpoint
 # The record set name to the private IP of the storage account
-RECORD_SET_NAME="web-apache-storage"
 az network private-dns record-set a add-record \
 --record-set-name $RECORD_SET_NAME \
 --resource-group $RESOURCE_GROUP \
@@ -105,7 +105,7 @@ curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-drive
 # Create Apache Web server using Azure Files
 kubectl apply -f k8s/.
 k get pod -o wide
-k get pvc
+k get pv,pvc
 k get svc
 
 #Get azure storage account key 

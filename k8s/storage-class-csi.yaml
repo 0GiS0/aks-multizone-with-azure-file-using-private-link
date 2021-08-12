@@ -5,7 +5,7 @@ metadata:
 provisioner: file.csi.azure.com
 allowVolumeExpansion: true
 parameters:
-  resourceGroup: aks-multi-zones
+  resourceGroup: AKS-Demo
   storageAccount: webapache
   server:  web-apache-storage.private.file.core.windows.net
   shareName: content

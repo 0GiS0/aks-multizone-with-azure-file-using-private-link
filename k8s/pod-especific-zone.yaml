@@ -22,7 +22,7 @@ spec:
   - name: html
     persistentVolumeClaim:
       claimName: apache-content
-  nodeName: aks-nodepool1-33257421-vmss000000
+  nodeName: aks-nodepool1-25530853-vmss000000
 
 ---
 
