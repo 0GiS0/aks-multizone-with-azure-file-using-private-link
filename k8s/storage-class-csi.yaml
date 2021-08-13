@@ -5,10 +5,7 @@ metadata:
 provisioner: file.csi.azure.com
 allowVolumeExpansion: true
 parameters:
-  resourceGroup: AKS-Demo
-  storageAccount: webapache
-  server:  web-apache-storage.private.file.core.windows.net
-  shareName: content
+  networkEndpointType: privateEndpoint
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:
