@@ -36,6 +36,15 @@ kubectl get nodes -o custom-columns=NAME:'{.metadata.name}',REGION:'{.metadata.l
 curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/v1.5.0/deploy/install-driver.sh | bash -s v1.5.0 --
 k get pod -A
 
+### Preview ####
+az aks create \
+    --resource-group $RESOURCE_GROUP \
+    --name $AKS_NAME \
+    --generate-ssh-keys \
+    --node-count 3 \
+    --zones 1 2 3 \
+    --aks-custom-headers EnableAzureDiskFileCSIDriver=true
+
 # Create Apache Web server using Azure Files
 kubectl apply -f k8s/.
 k get pod -o wide
@@ -49,4 +58,4 @@ STORAGE_KEY=$(az storage account keys list -g $RESOURCE_GROUP -n $PRIVATE_STORAG
 az storage file upload --source apache-content/index.php \
 --account-name $PRIVATE_STORAGE_ACCOUNT \
 --account-key $STORAGE_KEY \
---share-name content
+--share-name <NAME_OF_THE_SHARE_FILE>
